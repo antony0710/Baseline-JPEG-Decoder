@@ -37,6 +37,7 @@ def ColorConversion(Y, Cr, Cb):
     """
     Converts Y, Cr and Cb to RGB color space
     """
+
     R = Cr * (2 - 2 * 0.299) + Y
     B = Cb * (2 - 2 * 0.114) + Y
     G = (Y - 0.114 * B - 0.299 * R) / 0.587
@@ -239,7 +240,7 @@ class JPEG:
 
     def BuildMatrix(self, st, idx, quant, olddccoeff):
         i = IDCT()
-
+        #print("CODE:::: ",st)
         code = self.huffman_tables[0 + idx].GetCode(st)
         bits = st.GetBitN(code)
         dccoeff = DecodeNumber(code, bits) + olddccoeff
@@ -271,7 +272,7 @@ class JPEG:
 
     def StartOfScan(self, data, hdrlen):
         data, lenchunk = RemoveFF00(data[hdrlen:])
-
+        print(data[0:10])
         st = Stream(data)
         oldlumdccoeff, oldCbdccoeff, oldCrdccoeff = 0, 0, 0
         for y in range(self.height // 8):
@@ -310,7 +311,8 @@ class JPEG:
         for i in lengths:
             elements += GetArray("B", data[offset : offset + i], i)
             offset += i
-
+        print("LENGTHS!!!!!!!!!!!!!!!!!",lengths)
+        print("ELECMENTS!!!!!!!!!!!!!!!!!",elements)
         hf = HuffmanTable()
         hf.GetHuffmanBits(lengths, elements)
         self.huffman_tables[header] = hf
@@ -336,6 +338,8 @@ class JPEG:
                 elif marker == 0xFFC0:
                     self.BaselineDCT(chunk)
                 elif marker == 0xFFDA:
+                    print("FFDA")
+                    print(data[0:10])
                     len_chunk = self.StartOfScan(data, len_chunk)
                 data = data[len_chunk:]
             if len(data) == 0:
@@ -348,6 +352,6 @@ if __name__ == "__main__":
     master = Tk()
     w = Canvas(master, width=1600, height=600)
     w.pack()
-    img = JPEG("profile.jpg")
+    img = JPEG("test64en.jpg")
     img.decode()
     mainloop()
